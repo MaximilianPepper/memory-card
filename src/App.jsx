@@ -68,8 +68,8 @@ function App() {
     }
     setFlip(true); // Trigger flip animation
     setTimeout(() => {
-      setGifs(shuffle(updatedGifs));
       setFlip(false); // Reset flip animation after shuffling
+      setGifs(shuffle(updatedGifs));
     }, 600); // Match the duration of the CSS transition
   };
 
