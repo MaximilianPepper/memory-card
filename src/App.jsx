@@ -24,12 +24,26 @@ function App() {
     const fetchData = async () => {
       let data = [];
       let id = 0;
-      while (data.length < AMOUNT) {
+      const maxAttempts = 3;
+      let attempts = 0;
+      while (data.length < AMOUNT && attempts < maxAttempts) {
         try {
           const response = await fetch(
-            "https://api.giphy.com/v1/gifs/random?api_key=D5f3N5Obu6naX4mStCZ9Kv7P51wDCrnA",
+            "https://api.giphy.com/v1/gifs/random?api_key=QEDdCIiYSH8dqLkfGgff6M5b9ROjRJnb",
             { mode: "cors" }
           ); // free api key no point making .env file
+          console.log("fetched");
+          if (response.status === 429) {
+            attempts++;
+            throw new Error(
+              "Too many requests, please wait and try again later."
+            );
+          }
+
+          if (!response.ok) {
+            attempts++;
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
           const result = await response.json();
           data.push({
             link: result.data.images.downsized.url,
@@ -39,7 +53,9 @@ function App() {
           });
           id++;
         } catch {
-          (e) => alert(`Failed to get data: ${e.message}`);
+          (e) => {
+            console.log(`Failed to get data: ${e.message}`);
+          };
         }
       }
 
