@@ -3,15 +3,17 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import Card from "./Card.jsx";
 
+const AMOUNT = 8;
 function App() {
   const [gifs, setGifs] = useState([]);
   const [currentScore, setCurrentScore] = useState(0);
   const [topScore, setTopScore] = useState(0);
   const [userWin, setUserWin] = useState(false);
+  const [flip, setFlip] = useState(false);
 
   useEffect(() => {
     if (currentScore > topScore) setTopScore(currentScore);
-    if (currentScore === 5) {
+    if (currentScore === AMOUNT) {
       setCurrentScore(0);
       setUserWin(true);
       setTimeout(() => setUserWin(false), 5000);
@@ -22,12 +24,12 @@ function App() {
     const fetchData = async () => {
       let data = [];
       let id = 0;
-      while (data.length < 5) {
+      while (data.length < AMOUNT) {
         try {
           const response = await fetch(
-            "https://api.giphy.com/v1/gifs/random?api_key=hRZnES7IsDsZW8tj11ij9aGi09ecEbjx",
+            "https://api.giphy.com/v1/gifs/random?api_key=D5f3N5Obu6naX4mStCZ9Kv7P51wDCrnA",
             { mode: "cors" }
-          );
+          ); // free api key no point making .env file
           const result = await response.json();
           data.push({
             link: result.data.images.downsized.url,
@@ -64,24 +66,28 @@ function App() {
     if (reset) {
       updatedGifs = updatedGifs.map((item) => ({ ...item, clicked: false }));
     }
-    setGifs(shuffle(updatedGifs));
+    setFlip(true); // Trigger flip animation
+    setTimeout(() => {
+      setGifs(shuffle(updatedGifs));
+      setFlip(false); // Reset flip animation after shuffling
+    }, 600); // Match the duration of the CSS transition
   };
 
   if (userWin)
     return (
       <>
-        <p>You win TEMP</p>
+        <p>Congratulations! You win!</p>
       </>
     );
   return (
     <>
-      <div>
+      <div className="title">
         <h1>Gifs memory game</h1>
         <p>Top score: {topScore}</p>
       </div>
-      <div>
+      <div className="title1">
         <h4>Make sure to not click the same card twice!</h4>
-        <p>Current score: {currentScore}</p>
+        <h4>Current score: {currentScore}</h4>
       </div>
       <div className="container">
         {gifs.map((gif) => (
@@ -90,6 +96,7 @@ function App() {
             link={gif.link}
             title={gif.title}
             cardClicked={() => cardClicked(gif.id)}
+            flip={flip}
           />
         ))}
       </div>
